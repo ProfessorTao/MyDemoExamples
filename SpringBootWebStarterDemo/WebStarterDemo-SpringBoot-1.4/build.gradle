@@ -1,0 +1,80 @@
+
+buildscript {
+    ext {
+        springBootVersion = '1.4.7.RELEASE'
+    }
+    repositories {
+        mavenLocal()
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.wso2.org/nexus/content/groups/public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+
+group 'individual.professortao.example'
+version '1.0'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'application'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+// targetCompatibility = 1.8
+
+// https://www.iteblog.com/archives/2022.html
+repositories {
+    mavenLocal()
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url 'http://maven.wso2.org/nexus/content/groups/public/' }
+    mavenCentral()
+}
+
+jar {
+    baseName = rootProject.name
+    version = project.version
+}
+
+
+distributions {
+    main {
+        baseName = rootProject.name
+        version = ""
+        contents {
+            from('.') {
+                include '*.yml'
+                into "bin"
+            }
+        }
+    }
+}
+
+
+// https://stackoverflow.com/questions/5743036/deploy-additional-files-in-gradle-application-plugin
+distZip {
+//    into(project.name+"-"+project.version) {
+    into(project.name) {
+        from '.'
+        include 'config/*'
+        include 'script/*'
+    }
+}
+
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile('org.springframework.boot:spring-boot-starter-web')
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.18'
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-core
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+}
+
+
+tasks.startScripts.defaultJvmOpts += [
+        '-Dservice.name=professortai-springboot-webstart-demo'
+]
